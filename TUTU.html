@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Цифровой помощник</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --accent: #f59e0b;
+      --accent-dark: #d97706;
+      --bg-light: #f9fafb;
+      --bg-card: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      line-height: 1.6;
+      font-size: 16px;
+      min-height: 100vh;
+    }
+
+    .page {
+      display: none;
+      padding: 24px 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px 0;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 18px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Back button */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--bg-card);
+      color: var(--primary);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .back-btn:hover {
+      background: #f0f4ff;
+      transform: translateX(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Category grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .category-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      border: 2px solid transparent;
+    }
+
+    .category-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .category-card i {
+      font-size: 42px;
+      margin-bottom: 16px;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .category-card h3 {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 12px;
+    }
+
+    /* OS selection */
+    .os-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      margin-top: 24px;
+    }
+
+    .os-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-md);
+      border: 2px solid var(--border);
+    }
+
+    .os-card:hover {
+      transform: scale(1.03);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .os-card i {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .os-card.android i { color: #10b981; }
+    .os-card.iphone i { color: #000000; }
+
+    .os-card h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .os-card p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-top: 8px;
+    }
+
+    /* App list */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .app-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      border: 2px solid var(--border);
+    }
+
+    .app-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .app-icon {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius-md);
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .app-card.sber .app-icon { background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); }
+    .app-card.tbank .app-icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .app-card.alfa .app-icon { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    .app-card.vtb .app-icon { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+    .app-card.gosuslugi .app-icon { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); }
+    .app-card.mosru .app-icon { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
+    .app-card.moynalog .app-icon { background: linear-gradient(135deg, #0d9488 0%, #047857 100%); }
+    .app-card.yandex_go .app-icon { background: linear-gradient(135deg, #000000 0%, #1f2937 100%); }
+    .app-card.uber .app-icon { background: linear-gradient(135deg, #000000 0%, #1f2937 100%); }
+    .app-card.yandex_eda .app-icon { background: linear-gradient(135deg, #ff5e00 0%, #ea580c 100%); }
+    .app-card.delivery_club .app-icon { background: linear-gradient(135deg, #ff6b35 0%, #f97316 100%); }
+    .app-card.samokat .app-icon { background: linear-gradient(135deg, #0d9488 0%, #047857 100%); }
+    .app-card.ozon .app-icon { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+    .app-card.wildberries .app-icon { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+    .app-card.yandex_market .app-icon { background: linear-gradient(135deg, #ff5e00 0%, #ea580c 100%); }
+    .app-card.whatsapp .app-icon { background: linear-gradient(135deg, #25d366 0%, #16a34a 100%); }
+    .app-card.telegram .app-icon { background: linear-gradient(135deg, #0088cc 0%, #0369a1 100%); }
+    .app-card.max .app-icon { background: linear-gradient(135deg, #8e44ad 0%, #7e22ce 100%); }
+
+    .app-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .app-card .dev {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Instructions */
+    .instruction-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .instruction-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .instruction-header .subtitle {
+      color: var(--text-secondary);
+      font-size: 17px;
+    }
+
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--primary);
+    }
+
+    .step-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-number {
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      width: 40px;
+      height: 40px;
+      background: var(--primary-gradient);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .step-content {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .step-content strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .step-content code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    /* Notes */
+    .note-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border-left: 4px solid #10b981;
+      padding: 20px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin: 24px 0;
+    }
+
+    .warning-card {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border-left: 4px solid var(--accent);
+      padding: 20px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin: 24px 0;
+    }
+
+    .note-card h4,
+    .warning-card h4 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .note-card h4 { color: #065f46; }
+    .warning-card h4 { color: #92400e; }
+
+    .note-card p,
+    .warning-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 { font-size: 28px; }
+      .header p { font-size: 16px; }
+      
+      .category-grid,
+      .os-grid,
+      .app-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .os-card {
+        padding: 24px 16px;
+      }
+      
+      .os-card i {
+        font-size: 48px;
+      }
+      
+      .os-card h3 {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page { padding: 16px; }
+      .header h1 { font-size: 24px; }
+      .header p { font-size: 15px; }
+      
+      .category-grid,
+      .os-grid,
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .step-card {
+        padding: 20px;
+      }
+      
+      .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Главная страница -->
+  <div id="page-home" class="page active">
+    <div class="header">
+      <h1>Цифровой помощник</h1>
+      <p>Пошаговые инструкции для новичков — просто, понятно, без ошибок</p>
+    </div>
+
+    <div class="category-grid">
+      <div class="category-card" onclick="goToCategory('gov')">
+        <i class="fas fa-landmark"></i>
+        <h3>Госуслуги</h3>
+      </div>
+      <div class="category-card" onclick="goToCategory('banks')">
+        <i class="fas fa-university"></i>
+        <h3>Банки</h3>
+      </div>
+      <div class="category-card" onclick="goToCategory('food')">
+        <i class="fas fa-utensils"></i>
+        <h3>Еда</h3>
+      </div>
+      <div class="category-card" onclick="goToCategory('taxi')">
+        <i class="fas fa-taxi"></i>
+        <h3>Такси</h3>
+      </div>
+      <div class="category-card" onclick="goToCategory('market')">
+        <i class="fas fa-shopping-bag"></i>
+        <h3>Покупки</h3>
+      </div>
+      <div class="category-card" onclick="goToCategory('messengers')">
+        <i class="fas fa-comments"></i>
+        <h3>Мессенджеры</h3>
+      </div>
+      <div class="category-card" onclick="showPage('security')">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Безопасность</h3>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Цифровой помощник — Юсупов Д.Д.</p>
+    </footer>
+  </div>
+
+  <!-- Выбор ОС -->
+  <div id="page-os" class="page">
+    <a href="#" class="back-btn" onclick="showPage('home')">
+      <i class="fas fa-arrow-left"></i> Назад к категориям
+    </a>
+
+    <div class="header">
+      <h1 id="os-title">Выберите категорию</h1>
+      <p>Сначала укажите ваше устройство</p>
+    </div>
+
+    <div class="os-grid">
+      <div class="os-card android" onclick="showAppList(currentCategory, 'android')">
+        <i class="fab fa-android"></i>
+        <h3>Android</h3>
+        <p>Устройства на базе Android<br>с магазином приложений RuStore</p>
+      </div>
+      <div class="os-card iphone" onclick="showAppList(currentCategory, 'iphone')">
+        <i class="fab fa-apple"></i>
+        <h3>iPhone</h3>
+        <p>Смартфоны Apple<br>с магазином приложений App Store</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Список приложений -->
+  <div id="page-apps" class="page">
+    <a href="#" class="back-btn" onclick="goToCategory(currentCategory)">
+      <i class="fas fa-arrow-left"></i> Назад к выбору ОС
+    </a>
+
+    <div class="header">
+      <h1 id="apps-title">Выберите приложение</h1>
+    </div>
+
+    <div class="app-grid" id="app-list-container"></div>
+  </div>
+
+  <!-- Инструкция -->
+  <div id="page-instruction" class="page">
+    <a href="#" class="back-btn" onclick="showAppList(currentCategory, currentOS)">
+      <i class="fas fa-arrow-left"></i> Назад к приложениям
+    </a>
+
+    <div class="instruction-header">
+      <h2 id="instruction-title">Инструкция</h2>
+      <p class="subtitle" id="instruction-subtitle">Пошаговое руководство</p>
+    </div>
+
+    <div class="steps-container" id="instruction-steps"></div>
+  </div>
+
+  <!-- Безопасность -->
+  <div id="page-security" class="page">
+    <a href="#" class="back-btn" onclick="showPage('home')">
+      <i class="fas fa-arrow-left"></i> Назад к категориям
+    </a>
+
+    <div class="instruction-header">
+      <h2>🔒 Правила безопасности в интернете</h2>
+      <p class="subtitle">Как защитить себя от мошенников</p>
+    </div>
+
+    <div class="steps-container">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-title">Никогда не сообщайте личные данные</div>
+        <div class="step-content">
+          <strong>Не называйте по телефону, в сообщениях или на сайтах:</strong>
+          <ul style="margin-top: 10px; padding-left: 24px;">
+            <li>Пароли от приложений и сайтов</li>
+            <li>PIN-коды банковских карт</li>
+            <li>CVV-код (3 цифры на обороте карты)</li>
+            <li>Коды из SMS и одноразовые пароли</li>
+          </ul>
+          <br>
+          <strong>Даже если звонят и представляются сотрудником банка, полиции или Госуслуг — это мошенники!</strong>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-title">Устанавливайте приложения только из официальных магазинов</div>
+        <div class="step-content">
+          <strong>На Android:</strong> только из <strong>RuStore</strong><br>
+          <strong>На iPhone:</strong> только из <strong>App Store</strong>
+          <br><br>
+          Никогда не нажимайте кнопку «Установить» на сайтах, в сообщениях или по ссылкам из SMS. Мошенники создают фальшивые страницы, похожие на настоящие магазины приложений.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-title">Проверяйте адрес сайта перед вводом данных</div>
+        <div class="step-content">
+          Перед тем как вводить пароль, номер карты или другие данные:
+          <ul style="margin-top: 10px; padding-left: 24px;">
+            <li>Убедитесь, что адрес начинается с <code>https://</code> (зелёный замок в браузере)</li>
+            <li>Проверьте правильность написания — мошенники используют похожие адреса</li>
+          </ul>
+          <br>
+          <strong>Пример правильного адреса:</strong> <code>https://www.sberbank.ru</code><br>
+          <strong>Пример мошеннического:</strong> <code>https://sber-bank-online.ru</code>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <div class="step-title">Если звонят «из банка» — положите трубку</div>
+        <div class="step-content">
+          Настоящий банк <strong>никогда</strong> не звонит и не просит:
+          <ul style="margin-top: 10px; padding-left: 24px;">
+            <li>Назвать код из SMS</li>
+            <li>Продиктовать данные карты</li>
+            <li>Подтвердить операцию по телефону</li>
+          </ul>
+          <br>
+          <strong>Что делать:</strong>
+          <ol style="margin-top: 10px; padding-left: 24px;">
+            <li>Положите трубку</li>
+            <li>Самостоятельно откройте приложение банка</li>
+            <li>Позвоните в поддержку через приложение или по номеру с обратной стороны карты</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">5</div>
+        <div class="step-title">Не переходите по ссылкам из подозрительных сообщений</div>
+        <div class="step-content">
+          <strong>Особенно опасны сообщения с текстом:</strong>
+          <ul style="margin-top: 10px; padding-left: 24px;">
+            <li>«Ваш заказ отменён»</li>
+            <li>«Аккаунт заблокирован»</li>
+            <li>«Перейдите для подтверждения»</li>
+            <li>«Вы выиграли приз»</li>
+            <li>«Срочно подтвердите данные»</li>
+          </ul>
+          <br>
+          Это 100% мошенники. Настоящие компании никогда не просят перейти по ссылке из SMS для подтверждения данных.
+        </div>
+      </div>
+
+      <div class="warning-card">
+        <h4><i class="fas fa-exclamation-triangle"></i> Главное правило</h4>
+        <p><strong>Настоящие банки, Госуслуги, налоговая и другие госорганы НИКОГДА не запрашивают одноразовые коды, пароли или данные карты по телефону, SMS или email.</strong></p>
+        <p style="margin-top: 8px;">Если вам что-то просят — это мошенники. Положите трубку и перезвоните в официальную поддержку самостоятельно.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentCategory = '';
+    let currentOS = '';
+
+    const categories = {
+      gov: 'Государственные сервисы',
+      banks: 'Банковские приложения',
+      food: 'Доставка еды',
+      taxi: 'Заказ такси',
+      market: 'Покупки онлайн',
+      messengers: 'Мессенджеры'
+    };
+
+    const apps = {
+      gov: {
+        android: [
+          { id: 'gosuslugi', name: 'Госуслуги', dev: 'Минцифры РФ', icon: '📝' },
+          { id: 'mosru', name: 'mos.ru', dev: 'Правительство Москвы', icon: '🏛️' },
+          { id: 'moynalog', name: 'Мой налог', dev: 'ФНС России', icon: '💰' }
+        ],
+        iphone: [
+          { id: 'gosuslugi', name: 'Госуслуги', dev: 'Ministry of Digital Development', icon: '📝' },
+          { id: 'mosru', name: 'mos.ru', dev: 'Moscow Government', icon: '🏛️' },
+          { id: 'moynalog', name: 'Мой налог', dev: 'Federal Tax Service', icon: '💰' }
+        ]
+      },
+      banks: {
+        android: [
+          { id: 'sber', name: 'СберБанк Онлайн', dev: 'ПАО Сбербанк', icon: '🟢' },
+          { id: 'tbank', name: 'Т-Банк', dev: 'T-Bank', icon: '🟡' },
+          { id: 'alfa', name: 'Альфа Мобайл', dev: 'АО «Альфа-Банк»', icon: '🔴' },
+          { id: 'vtb', name: 'ВТБ Онлайн', dev: 'ПАО ВТБ', icon: '🔵' }
+        ],
+        iphone: [
+          { id: 'sber', name: 'SberBank Online', dev: 'PJSC Sberbank', icon: '🟢' },
+          { id: 'tbank', name: 'T-Bank', dev: 'T-Bank', icon: '🟡' },
+          { id: 'alfa', name: 'AlfaMobile', dev: 'AO Alfa-Bank', icon: '🔴' },
+          { id: 'vtb', name: 'VTB Online', dev: 'PJSC VTB', icon: '🔵' }
+        ]
+      },
+      food: {
+        android: [
+          { id: 'yandex_eda', name: 'Яндекс Еда', dev: 'Yandex Services B.V.', icon: '🍔' },
+          { id: 'delivery_club', name: 'Delivery Club', dev: 'Delivery Club LLC', icon: '🍕' },
+          { id: 'samokat', name: 'Самокат', dev: 'OOO «Самокат»', icon: '🛒' }
+        ],
+        iphone: [
+          { id: 'yandex_eda', name: 'Yandex Eats', dev: 'Yandex Services B.V.', icon: '🍔' },
+          { id: 'delivery_club', name: 'Delivery Club', dev: 'Delivery Club LLC', icon: '🍕' },
+          { id: 'samokat', name: 'Samokat', dev: 'Samokat LLC', icon: '🛒' }
+        ]
+      },
+      taxi: {
+        android: [
+          { id: 'yandex_go', name: 'Яндекс Go', dev: 'Yandex Services B.V.', icon: '🚗' },
+          { id: 'uber', name: 'Uber Россия', dev: 'Uber Technologies Inc.', icon: '🚕' },
+          { id: 'citymobil', name: 'Ситимобил', dev: 'OOO «Ситимобил»', icon: '🚕' }
+        ],
+        iphone: [
+          { id: 'yandex_go', name: 'Yandex Go', dev: 'Yandex Services B.V.', icon: '🚗' },
+          { id: 'uber', name: 'Uber', dev: 'Uber Technologies Inc.', icon: '🚕' },
+          { id: 'citymobil', name: 'Citymobil', dev: 'Citymobil LLC', icon: '🚕' }
+        ]
+      },
+      market: {
+        android: [
+          { id: 'ozon', name: 'OZON', dev: 'OZON LLC', icon: '📦' },
+          { id: 'wildberries', name: 'Вайлдберриз', dev: 'ООО «Вайлдберриз»', icon: '💜' },
+          { id: 'yandex_market', name: 'Яндекс Маркет', dev: 'Yandex Services B.V.', icon: '🛒' }
+        ],
+        iphone: [
+          { id: 'ozon', name: 'OZON', dev: 'OZON LLC', icon: '📦' },
+          { id: 'wildberries', name: 'Wildberries', dev: 'Wildberries LLC', icon: '💜' },
+          { id: 'yandex_market', name: 'Yandex Market', dev: 'Yandex Services B.V.', icon: '🛒' }
+        ]
+      },
+      messengers: {
+        android: [
+          { id: 'whatsapp', name: 'WhatsApp Messenger', dev: 'Meta Platforms, Inc.', icon: '💬' },
+          { id: 'telegram', name: 'Telegram', dev: 'Telegram FZ-LLC', icon: '✈️' },
+          { id: 'max', name: 'Max', dev: 'VK LLC', icon: 'Ⓜ️' }
+        ],
+        iphone: [
+          { id: 'whatsapp', name: 'WhatsApp Messenger', dev: 'Meta Platforms, Inc.', icon: '💬' },
+          { id: 'telegram', name: 'Telegram', dev: 'Telegram FZ-LLC', icon: '✈️' },
+          { id: 'max', name: 'Max', dev: 'VK LLC', icon: 'Ⓜ️' }
+        ]
+      }
+    };
+
+    const instructions = {
+      // === ГОСУСЛУГИ ===
+      gosuslugi: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "На главном экране вашего телефона найдите значок RuStore (обычно синий с белой буквой 'R'). Нажмите на него один раз."
+          },
+          {
+            title: "Найдите приложение «Госуслуги»",
+            content: "В верхней части экрана вы увидите строку поиска. Нажмите на неё и наберите: <strong>Госуслуги</strong>. Затем нажмите кнопку «Найти» или клавишу Enter на экранной клавиатуре."
+          },
+          {
+            title: "Проверьте разработчика приложения",
+            content: "В результатах поиска найдите приложение с логотипом РФ (голубой фон с гербом). <strong>Важно:</strong> убедитесь, что в строке «Разработчик» написано <strong>«Минцифры РФ»</strong>. Мошенники создают поддельные приложения с похожими названиями!"
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите большую зелёную кнопку <strong>«Установить»</strong>. Подождите, пока приложение скачается и установится на ваш телефон (обычно это занимает 10–30 секунд)."
+          },
+          {
+            title: "Зарегистрируйтесь в приложении",
+            content: "После установки откройте приложение. Нажмите кнопку <strong>«Зарегистрироваться»</strong>. Заполните все поля:<br>• Фамилия, имя, отчество<br>• Номер мобильного телефона<br>• СНИЛС (11 цифр, есть на зелёной карточке или в приложении ПФР)<br>Нажмите «Продолжить»."
+          },
+          {
+            title: "Подтвердите номер телефона",
+            content: "На ваш телефон придёт SMS с кодом из 6 цифр. Введите этот код в соответствующее поле в приложении. Если код не пришёл в течение минуты, нажмите кнопку <strong>«Отправить повторно»</strong>."
+          },
+          {
+            title: "Подтвердите свою личность",
+            content: "Чтобы получить доступ ко всем услугам (оплата штрафов со скидкой 50%, получение паспорта, запись к врачу), обязательно подтвердите свой аккаунт. Для этого:<br>1. Зайдите в ближайший МФЦ, отделение Почты России, Сбербанка или Почта Банка<br>2. Скажите сотруднику: «Хочу подтвердить аккаунт на Госуслугах»<br>3. Покажите паспорт<br>Это займёт 5–10 минут и совершенно бесплатно."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Нажмите на синюю иконку App Store на главном экране вашего iPhone."
+          },
+          {
+            title: "Найдите «Госуслуги»",
+            content: "Внизу экрана нажмите на значок лупы (поиск). В появившейся строке наберите: <strong>Госуслуги</strong>."
+          },
+          {
+            title: "Проверьте разработчика",
+            content: "Выберите приложение с гербом РФ. Убедитесь, что в разделе «Разработчик» указано: <strong>Ministry of Digital Development</strong>. Это официальное приложение."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Загрузить»</strong> (значок облака со стрелкой вниз). Возможно, потребуется подтвердить установку с помощью Face ID, Touch ID или пароля от Apple ID."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Откройте установленное приложение. Нажмите «Зарегистрироваться» и введите свои данные: ФИО, номер телефона, СНИЛС."
+          },
+          {
+            title: "Подтвердите SMS",
+            content: "Введите код из SMS, который придёт на ваш телефон."
+          },
+          {
+            title: "Подтвердите личность",
+            content: "Обязательно посетите МФЦ или банк для подтверждения аккаунта — без этого многие услуги будут недоступны."
+          }
+        ]
+      },
+
+      // === MOS.RU ===
+      mosru: {
+        android: [
+          {
+            title: "Откройте браузер",
+            content: "Запустите любой браузер на вашем телефоне: Chrome, Яндекс.Браузер, или любой другой."
+          },
+          {
+            title: "Перейдите на сайт mos.ru",
+            content: "В верхней строке браузера (адресная строка) наберите: <strong>https://www.mos.ru</strong> и нажмите клавишу Enter."
+          },
+          {
+            title: "Войдите через Госуслуги",
+            content: "На главной странице сайта нажмите кнопку <strong>«Войти»</strong>. В появившемся меню выберите вариант <strong>«Через Госуслуги»</strong>. Откроется окно подтверждения — подтвердите вход в приложении Госуслуги на вашем телефоне, нажав «Разрешить»."
+          },
+          {
+            title: "Начните пользоваться услугами",
+            content: "После входа вы увидите список доступных услуг Москвы:<br>• Оплата ЖКХ<br>• Запись к врачу<br>• Поиск ближайшего МФЦ<br>• Оплата парковки"
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте Safari",
+            content: "Нажмите на иконку Safari (компас) на главном экране."
+          },
+          {
+            title: "Наберите адрес сайта",
+            content: "В адресной строке вверху наберите: <strong>https://www.mos.ru</strong> и нажмите «Перейти»."
+          },
+          {
+            title: "Войдите через Госуслуги",
+            content: "Нажмите «Войти» → «Через Госуслуги» → подтвердите вход в приложении Госуслуги на вашем iPhone."
+          },
+          {
+            title: "Пользуйтесь услугами",
+            content: "Теперь все услуги правительства Москвы доступны в вашем браузере."
+          }
+        ]
+      },
+
+      // === МОЙ НАЛОГ ===
+      moynalog: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите и откройте приложение «Мой налог» от разработчика <strong>ФНС России</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "После установки откройте «Мой налог»."
+          },
+          {
+            title: "Войдите в систему",
+            content: "Если вы самозанятый — войдите через Госуслуги. Если физическое лицо — введите ваш ИНН и подтвердите вход."
+          },
+          {
+            title: "Проверьте налоги",
+            content: "Теперь вы можете проверить налоговую задолженность, оплатить налоги онлайн, получить уведомления о начислениях."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение «Мой налог» от разработчика <strong>Federal Tax Service</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Войдите в приложение",
+            content: "Введите ИНН или войдите через Госуслуги."
+          },
+          {
+            title: "Пользуйтесь услугами",
+            content: "Проверяйте и оплачивайте налоги, получайте уведомления."
+          }
+        ]
+      },
+
+      // === СБЕРБАНК ===
+      sber: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«СберБанк Онлайн»</strong>. Обратите внимание: разработчик должен быть <strong>«ПАО Сбербанк»</strong>. Это важно — мошенники создают поддельные приложения!"
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong>. Дождитесь завершения загрузки и установки (обычно 15-30 секунд)."
+          },
+          {
+            title: "Откройте приложение",
+            content: "После установки нажмите «Открыть» или найдите иконку СберБанка на главном экране."
+          },
+          {
+            title: "Введите номер телефона",
+            content: "На первом экране введите номер телефона, который привязан к вашей карте СберБанка. Нажмите «Продолжить»."
+          },
+          {
+            title: "Подтвердите вход по SMS",
+            content: "На ваш телефон придёт сообщение с кодом из 6 цифр. Введите этот код в поле подтверждения."
+          },
+          {
+            title: "Введите данные карты (если требуется)",
+            content: "При первом входе система может попросить ввести:<br>• Последние 4 цифры вашей карты СберБанка<br>• Срок действия карты (месяц и год, например: 08/28)<br>Это нужно для дополнительной безопасности."
+          },
+          {
+            title: "Если у вас нет карты СберБанка",
+            content: "Нажмите кнопку <strong>«Заказать карту»</strong> в главном меню. Выберите тип карты (дебетовая, кредитная), заполните анкету и подтвердите заявку. Карта будет доставлена курьером или в отделение банка в течение 2-5 дней."
+          },
+          {
+            title: "Начните пользоваться",
+            content: "Теперь вы можете:<br>• Оплачивать ЖКХ, интернет, штрафы ГИБДД<br>• Переводить деньги другим людям"
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«SberBank Online»</strong> от разработчика <strong>«PJSC Sberbank»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Загрузить»</strong>. Подтвердите установку с помощью Face ID или пароля от Apple ID."
+          },
+          {
+            title: "Войдите в приложение",
+            content: "Введите номер телефона, привязанный к карте СберБанка."
+          },
+          {
+            title: "Подтвердите SMS",
+            content: "Введите код из SMS для подтверждения входа."
+          },
+          {
+            title: "Введите данные карты",
+            content: "При необходимости введите последние 4 цифры карты и срок её действия."
+          },
+          {
+            title: "Пользуйтесь всеми функциями",
+            content: "Оплачивайте услуги, переводите деньги, открывайте вклады."
+          }
+        ]
+      },
+
+      // === Т-БАНК ===
+      tbank: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Т-Банк»</strong> (бывший Тинькофф). Разработчик: <strong>«T-Bank»</strong>. Иконка приложения — жёлтая с белой буквой «T»."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку Т-Банка на главном экране."
+          },
+          {
+            title: "Введите номер телефона",
+            content: "В поле ввода укажите номер телефона, привязанный к вашей карте Т-Банка. Нажмите «Продолжить»."
+          },
+          {
+            title: "Подтвердите вход по SMS",
+            content: "Введите код из SMS, который придёт на ваш телефон."
+          },
+          {
+            title: "Введите данные карты",
+            content: "При первом входе система попросит ввести:<br>• Последние 4 цифры вашей карты Т-Банка<br>• Срок действия карты (месяц/год, например: 11/27)"
+          },
+          {
+            title: "Если у вас нет карты Т-Банка",
+            content: "Нажмите кнопку <strong>«Заказать карту»</strong>. Выберите тип карты, заполните анкету (ФИО, паспортные данные), подтвердите заявку. Карта будет доставлена курьером бесплатно в течение 1-3 дней."
+          },
+          {
+            title: "Оплата по QR-коду",
+            content: "В магазине нажмите на значок <strong>QR-сканера</strong> в нижней части экрана. Наведите камеру на QR-код на кассе, введите сумму покупки и подтвердите оплату."
+          },
+          {
+            title: "Система быстрых платежей (СБП)",
+            content: "При оплате в других приложениях (например, в OZON или Яндекс Еде) выберите способ оплаты «СБП» → «Т-Банк». Подтвердите операцию в приложении Т-Банка."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«T-Bank»</strong> от разработчика <strong>«T-Bank»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Войдите в приложение",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Введите данные карты",
+            content: "Укажите последние 4 цифры карты и срок её действия."
+          },
+          {
+            title: "Пользуйтесь всеми функциями",
+            content: "Оплачивайте по QR-коду, используйте СБП, переводите деньги."
+          }
+        ]
+      },
+
+      // === АЛЬФА-БАНК ===
+      alfa: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Альфа Мобайл»</strong>. Разработчик: <strong>«АО «Альфа-Банк»»</strong>. Иконка приложения — красная."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку Альфа-Банка на главном экране."
+          },
+          {
+            title: "Введите номер телефона",
+            content: "Укажите номер телефона, привязанный к вашей карте Альфа-Банка. Нажмите «Продолжить»."
+          },
+          {
+            title: "Подтвердите вход по SMS",
+            content: "Введите код из SMS для подтверждения входа."
+          },
+          {
+            title: "Введите данные карты",
+            content: "При первом входе система попросит ввести:<br>• Последние 4 цифры вашей карты Альфа-Банка<br>• Срок действия карты (месяц/год)"
+          },
+          {
+            title: "Если у вас нет карты Альфа-Банка",
+            content: "Нажмите кнопку <strong>«Открыть счёт»</strong> или <strong>«Заказать карту»</strong>. Заполните анкету с паспортными данными и подтвердите заявку."
+          },
+          {
+            title: "Оплата услуг",
+            content: "Чтобы оплатить интернет, ЖКХ или другие услуги: нажмите «Платежи» → выберите категорию → введите реквизиты получателя → подтвердите оплату."
+          },
+          {
+            title: "Поддержка",
+            content: "Нажмите значок <strong>«?»</strong> в правом верхнем углу → выберите «Написать в чат». Ответ приходит в течение 1-2 минут."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«AlfaMobile»</strong> от разработчика <strong>«AO Alfa-Bank»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Войдите в приложение",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Введите данные карты",
+            content: "Укажите последние 4 цифры карты и срок её действия."
+          },
+          {
+            title: "Пользуйтесь всеми функциями",
+            content: "Оплачивайте услуги, переводите деньги, обращайтесь в поддержку."
+          }
+        ]
+      },
+
+      // === ВТБ ===
+      vtb: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«ВТБ Онлайн»</strong>. Разработчик: <strong>«ПАО ВТБ»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку ВТБ на главном экране."
+          },
+          {
+            title: "Введите номер телефона",
+            content: "Укажите номер телефона, привязанный к вашей карте ВТБ. Нажмите «Продолжить»."
+          },
+          {
+            title: "Подтвердите вход по SMS",
+            content: "Введите код из SMS для подтверждения входа."
+          },
+          {
+            title: "Введите данные карты",
+            content: "При первом входе система может попросить ввести последние 4 цифры карты и срок её действия."
+          },
+          {
+            title: "Если у вас нет карты ВТБ",
+            content: "Нажмите кнопку <strong>«Заказать карту»</strong>. Выберите тип карты, заполните анкету и подтвердите заявку."
+          },
+          {
+            title: "Пользуйтесь всеми функциями",
+            content: "Оплачивайте услуги, переводите деньги, открывайте вклады."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«VTB Online»</strong> от разработчика <strong>«PJSC VTB»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Войдите в приложение",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Пользуйтесь всеми функциями",
+            content: "Оплачивайте услуги, переводите деньги, открывайте вклады."
+          }
+        ]
+      },
+
+      // === ЯНДЕКС ЕДА ===
+      yandex_eda: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Яндекс»</strong>. Разработчик: <strong>«Yandex Services B.V.»</strong>. Важно: для заказа еды нужно установить именно приложение «Яндекс», а не отдельное приложение «Яндекс Еда»."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку Яндекса на главном экране."
+          },
+          {
+            title: "Разрешите доступ к геолокации",
+            content: "При первом запуске приложение спросит разрешение на определение вашего местоположения. Нажмите <strong>«Разрешить»</strong> — это нужно, чтобы определить ваш адрес доставки."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Если геолокация не сработала или вы хотите указать другой адрес: нажмите на поле с адресом вверху экрана → введите улицу, дом, подъезд, этаж, квартиру → нажмите «Сохранить»."
+          },
+          {
+            title: "Перейдите в раздел «Еда»",
+            content: "В нижней части экрана нажмите на иконку <strong>«Еда»</strong> (тарелка с вилкой и ножом)."
+          },
+          {
+            title: "Выберите ресторан",
+            content: "Пролистайте список ресторанов или введите название в поиске (например: «пицца», «суши»). Нажмите на понравившийся ресторан, чтобы открыть меню."
+          },
+          {
+            title: "Добавьте блюда в корзину",
+            content: "Рядом с каждым блюдом есть кнопка <strong>«+»</strong>. Нажмите на неё, чтобы добавить блюдо в корзину. Чтобы добавить вторую порцию — нажмите «+» ещё раз."
+          },
+          {
+            title: "Перейдите в корзину",
+            content: "Нажмите на иконку корзины внизу экрана (корзина с цифрой — это количество блюд)."
+          },
+          {
+            title: "Выберите способ оплаты",
+            content: "Нажмите на поле «Способ оплаты» и выберите:<br>• <strong>Картой онлайн</strong><br>• <strong>СБП</strong><br>• <strong>Наличными курьеру</strong>"
+          },
+          {
+            title: "Оформите заказ",
+            content: "Проверьте состав заказа, адрес доставки и способ оплаты. Нажмите кнопку <strong>«Оформить заказ»</strong>."
+          },
+          {
+            title: "Отслеживайте заказ",
+            content: "После подтверждения заказа откроется экран с картой. Вы увидите:<br>• Фото курьера<br>• Номер машины<br>• Текущее местоположение курьера на карте"
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Yandex»</strong> от разработчика <strong>«Yandex Services B.V.»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Разрешите доступ к геолокации."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Введите точный адрес: улица, дом, подъезд, этаж, квартира."
+          },
+          {
+            title: "Перейдите в раздел «Еда»",
+            content: "Нажмите на иконку «Еда» внизу экрана."
+          },
+          {
+            title: "Выберите ресторан и блюда",
+            content: "Добавьте блюда в корзину, нажимая на кнопку «+»."
+          },
+          {
+            title: "Оформите заказ",
+            content: "Выберите способ оплаты (карта, СБП или наличные) и нажмите «Оформить заказ»."
+          },
+          {
+            title: "Отслеживайте курьера",
+            content: "На карте будет видно местоположение курьера и время прибытия."
+          }
+        ]
+      },
+
+      // === DELIVERY CLUB ===
+      delivery_club: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Delivery Club»</strong>. Разработчик: <strong>«Delivery Club LLC»</strong>. Иконка — оранжевая."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и нажмите «Продолжить». Подтвердите вход кодом из SMS."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Введите точный адрес: улица, дом, подъезд, этаж, квартира."
+          },
+          {
+            title: "Выберите ресторан",
+            content: "Пролистайте список или введите название в поиске. Нажмите на ресторан, чтобы открыть меню."
+          },
+          {
+            title: "Добавьте блюда",
+            content: "Нажимайте кнопку <strong>«+»</strong> рядом с блюдами, чтобы добавить их в корзину."
+          },
+          {
+            title: "Перейдите в корзину",
+            content: "Нажмите на иконку корзины внизу экрана."
+          },
+          {
+            title: "Выберите способ оплаты",
+            content: "Выберите: картой онлайн, через СБП или наличными при получении."
+          },
+          {
+            title: "Подтвердите заказ",
+            content: "Проверьте состав заказа и адрес. Нажмите <strong>«Оформить заказ»</strong>."
+          },
+          {
+            title: "Отслеживайте статус",
+            content: "В приложении будет отображаться статус заказа:<br>• <strong>«Готовят»</strong><br>• <strong>«Передан курьеру»</strong><br>• <strong>«В пути»</strong>"
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Delivery Club»</strong> от разработчика <strong>«Delivery Club LLC»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Введите точный адрес с подъездом, этажом и квартирой."
+          },
+          {
+            title: "Закажите еду",
+            content: "Выберите ресторан, добавьте блюда, выберите оплату и подтвердите заказ."
+          },
+          {
+            title: "Отслеживайте доставку",
+            content: "Следите за статусом заказа в приложении."
+          }
+        ]
+      },
+
+      // === САМОКАТ ===
+      samokat: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Самокат»</strong>. Разработчик: <strong>«OOO «Самокат»»</strong>. Иконка — зелёная."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Введите адрес, куда нужно привезти продукты. Обратите внимание: доставка работает только в пределах зоны покрытия."
+          },
+          {
+            title: "Выберите товары",
+            content: "Листайте категории: «Молоко и яйца», «Хлеб», «Вода», «Лекарства без рецепта». Нажимайте кнопку <strong>«+»</strong> у нужных товаров."
+          },
+          {
+            title: "Перейдите в корзину",
+            content: "Нажмите на иконку корзины внизу экрана."
+          },
+          {
+            title: "Выберите способ оплаты",
+            content: "Важно: в Самокате <strong>нет оплаты наличными</strong>. Выберите:<br>• <strong>Картой онлайн</strong><br>• <strong>СБП</strong>"
+          },
+          {
+            title: "Оформите заказ",
+            content: "Проверьте состав заказа и адрес. Нажмите <strong>«Оформить заказ»</strong>."
+          },
+          {
+            title: "Дождитесь доставки",
+            content: "Самокат обещает доставку за <strong>15–30 минут</strong>. Когда курьер выедет, вы получите уведомление. За 2 минуты до прибытия курьер позвонит вам."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Samokat»</strong> от разработчика <strong>«Samokat LLC»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Введите адрес в пределах зоны покрытия."
+          },
+          {
+            title: "Выберите товары",
+            content: "Добавляйте продукты в корзину, нажимая на кнопку «+»."
+          },
+          {
+            title: "Оплатите заказ",
+            content: "Выберите оплату картой или через СБП (наличные не принимаются)."
+          },
+          {
+            title: "Дождитесь доставки",
+            content: "Заказ приедет за 15–30 минут. Курьер позвонит за 2 минуты до прибытия."
+          }
+        ]
+      },
+
+      // === ЯНДЕКС GO ===
+      yandex_go: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Яндекс Go»</strong>. Разработчик: <strong>«Yandex Services B.V.»</strong>. Иконка — чёрная с красным кругом."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Разрешите доступ к геолокации",
+            content: "При первом запуске приложение спросит разрешение на определение вашего местоположения. Нажмите <strong>«Разрешить»</strong>."
+          },
+          {
+            title: "Укажите адрес назначения",
+            content: "В поле <strong>«Куда»</strong> введите адрес, куда нужно поехать. Можно:<br>• Написать вручную<br>• Нажать на значок микрофона и сказать адрес голосом"
+          },
+          {
+            title: "Выберите тариф",
+            content: "Ниже появятся варианты тарифов:<br>• <strong>«Эконом»</strong><br>• <strong>«Комфорт»</strong><br>• <strong>«Бизнес»</strong><br>Цена рассчитается автоматически."
+          },
+          {
+            title: "Вызовите такси",
+            content: "Нажмите большую кнопку <strong>«Вызвать»</strong> внизу экрана."
+          },
+          {
+            title: "Дождитесь водителя",
+            content: "Через 10–30 секунд придет уведомление: <strong>«Водитель найден»</strong>. Вы увидите:<br>• Марку и цвет машины<br>• Номер машины и номер телефона водителя"
+          },
+          {
+            title: "Оплата",
+            content: "Деньги спишутся автоматически с привязанной карты или через СБП после завершения поездки."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Yandex Go»</strong> от разработчика <strong>«Yandex Services B.V.»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Разрешите доступ к геолокации."
+          },
+          {
+            title: "Укажите адрес назначения",
+            content: "Введите адрес в поле «Куда» или скажите его голосом."
+          },
+          {
+            title: "Выберите тариф",
+            content: "Выберите «Эконом», «Комфорт» или «Бизнес»."
+          },
+          {
+            title: "Вызовите такси",
+            content: "Нажмите кнопку «Вызвать»."
+          },
+          {
+            title: "Дождитесь водителя",
+            content: "На карте будет видно, где находится водитель и как он едет к вам."
+          },
+          {
+            title: "Оплата",
+            content: "Деньги спишутся автоматически после поездки."
+          }
+        ]
+      },
+
+      // === УБЕР ===
+      uber: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Uber Россия»</strong>. Разработчик: <strong>«Uber Technologies Inc.»</strong>. Иконка — чёрная с белой буквой «U»."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Разрешите доступ к геолокации",
+            content: "При первом запуске приложение спросит разрешение на определение вашего местоположения. Нажмите <strong>«Разрешить»</strong>."
+          },
+          {
+            title: "Укажите адрес назначения",
+            content: "В поле <strong>«Куда»</strong> введите адрес, куда нужно поехать."
+          },
+          {
+            title: "Выберите тариф",
+            content: "Ниже появятся варианты тарифов:<br>• <strong>«UberX»</strong> — стандартный тариф<br>• <strong>«Comfort»</strong> — более комфортные машины"
+          },
+          {
+            title: "Добавьте способ оплаты",
+            content: "Если это ваш первый заказ, система попросит добавить способ оплаты. Нажмите <strong>«Добавить карту»</strong> и введите данные вашей банковской карты."
+          },
+          {
+            title: "Вызовите такси",
+            content: "Нажмите большую кнопку <strong>«Заказать»</strong> внизу экрана."
+          },
+          {
+            title: "Дождитесь водителя",
+            content: "Через 10–30 секунд придет уведомление: <strong>«Водитель найден»</strong>. Вы увидите:<br>• Марку и цвет машины<br>• Номер машины и номер телефона водителя"
+          },
+          {
+            title: "Оплата",
+            content: "Деньги спишутся автоматически с привязанной карты после завершения поездки."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Uber»</strong> от разработчика <strong>«Uber Technologies Inc.»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Разрешите доступ к геолокации."
+          },
+          {
+            title: "Укажите адрес назначения",
+            content: "Введите адрес в поле «Куда» или скажите его голосом."
+          },
+          {
+            title: "Выберите тариф",
+            content: "Выберите «UberX», «Comfort» или «Uber Black»."
+          },
+          {
+            title: "Добавьте способ оплаты",
+            content: "Введите данные банковской карты для оплаты поездок."
+          },
+          {
+            title: "Вызовите такси",
+            content: "Нажмите кнопку «Заказать»."
+          },
+          {
+            title: "Дождитесь водителя",
+            content: "На карте будет видно, где находится водитель и как он едет к вам."
+          },
+          {
+            title: "Оплата",
+            content: "Деньги спишутся автоматически после поездки."
+          }
+        ]
+      },
+
+      // === СИТИМОБИЛ ===
+      citymobil: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Ситимобил»</strong>. Разработчик: <strong>«OOO «Ситимобил»»</strong>. Иконка — жёлтая с чёрной буквой «C»."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и нажмите «Продолжить». Подтвердите вход кодом из SMS."
+          },
+          {
+            title: "Укажите точку отправления и назначения",
+            content: "Поле «Откуда» заполнится автоматически. В поле <strong>«Куда»</strong> введите адрес назначения."
+          },
+          {
+            title: "Выберите класс автомобиля",
+            content: "Выберите: «Эконом», «Комфорт», «Бизнес» или другой доступный класс."
+          },
+          {
+            title: "Подтвердите заказ",
+            content: "Нажмите кнопку <strong>«Заказать»</strong>."
+          },
+          {
+            title: "Дождитесь водителя",
+            content: "Как только водитель будет найден, вы получите уведомление. В приложении будет отображаться:<br>• Фото и имя водителя"
+          },
+          {
+            title: "Оплата",
+            content: "Оплатите поездку картой, через СБП или наличными."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Citymobil»</strong> от разработчика <strong>«Citymobil LLC»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Закажите такси",
+            content: "Укажите адрес назначения, выберите класс авто и нажмите «Заказать»."
+          },
+          {
+            title: "Дождитесь водителя",
+            content: "Следите за местоположением водителя на карте."
+          },
+          {
+            title: "Оплата",
+            content: "Оплатите поездку выбранным способом."
+          }
+        ]
+      },
+
+      // === OZON ===
+      ozon: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«OZON»</strong>. Разработчик: <strong>«OZON LLC»</strong>. Иконка — оранжевая."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и нажмите «Продолжить». Подтвердите вход кодом из SMS."
+          },
+          {
+            title: "Найдите товар",
+            content: "В верхней строке поиска введите название товара (например: «чайник», «кроссовки»). Нажмите «Найти»."
+          },
+          {
+            title: "Выберите товар",
+            content: "Пролистайте результаты поиска. Обращайте внимание на:<br>• <strong>Рейтинг</strong> — чем выше, тем лучше"
+          },
+          {
+            title: "Добавьте в корзину",
+            content: "Нажмите на понравившийся товар, чтобы открыть его страницу. Выберите параметры (цвет, размер). Нажмите кнопку <strong>«Купить»</strong>."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Введите адрес, куда нужно доставить товар."
+          },
+          {
+            title: "Выберите способ оплаты",
+            content: "Выберите:<br>• <strong>Онлайн картой</strong><br>• <strong>СБП</strong><br>• <strong>При получении</strong>"
+          },
+          {
+            title: "Подтвердите заказ",
+            content: "Проверьте состав заказа, адрес доставки и способ оплаты. Нажмите кнопку <strong>«Подтвердить заказ»</strong>."
+          },
+          {
+            title: "Отслеживайте доставку",
+            content: "В приложении будет отображаться статус заказа:<br>• <strong>«Принят»</strong><br>• <strong>«Передан в доставку»</strong><br>• <strong>«Курьер выехал»</strong>"
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«OZON»</strong> от разработчика <strong>«OZON LLC»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Найдите и купите товар",
+            content: "Используйте поиск, выберите товар, добавьте в корзину, укажите адрес и оплатите."
+          },
+          {
+            title: "Отслеживайте доставку",
+            content: "Следите за статусом заказа в приложении."
+          }
+        ]
+      },
+
+      // === ВАЙЛДБЕРРИЗ ===
+      wildberries: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Вайлдберриз»</strong>. Разработчик: <strong>«ООО «Вайлдберриз»»</strong>. Иконка — фиолетовая с белым логотипом."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и нажмите «Продолжить». Подтвердите вход кодом из SMS."
+          },
+          {
+            title: "Найдите товар",
+            content: "В верхней строке поиска введите название товара (например: «кроссовки», «платье»). Нажмите «Найти»."
+          },
+          {
+            title: "Выберите товар",
+            content: "Пролистайте результаты поиска. Обращайте внимание на:<br>• <strong>Рейтинг</strong> — чем выше, тем лучше"
+          },
+          {
+            title: "Выберите размер и цвет",
+            content: "Нажмите на понравившийся товар, чтобы открыть его страницу. Выберите размер (для одежды и обуви), цвет и другие параметры."
+          },
+          {
+            title: "Добавьте в корзину",
+            content: "Нажмите кнопку <strong>«Добавить в корзину»</strong>."
+          },
+          {
+            title: "Перейдите в корзину",
+            content: "Нажмите на иконку корзины внизу экрана."
+          },
+          {
+            title: "Укажите адрес доставки",
+            content: "Введите адрес, куда нужно доставить товар. Вайлдберриз доставляет в пункты выдачи (ПВЗ) по всей России."
+          },
+          {
+            title: "Выберите способ оплаты",
+            content: "Выберите:<br>• <strong>Онлайн картой</strong><br>• <strong>СБП</strong><br>• <strong>При получении</strong>"
+          },
+          {
+            title: "Подтвердите заказ",
+            content: "Проверьте состав заказа, адрес доставки и способ оплаты. Нажмите кнопку <strong>«Оформить заказ»</strong>."
+          },
+          {
+            title: "Отслеживайте доставку",
+            content: "В приложении будет отображаться статус заказа:<br>• <strong>«Передан в доставку»</strong><br>• <strong>«В пути»</strong><br>• <strong>«Прибыл в пункт выдачи»</strong>"
+          },
+          {
+            title: "Заберите заказ",
+            content: "Когда заказ прибудет в пункт выдачи, вы получите уведомление. Возьмите с собой паспорт и заберите заказ в указанном пункте выдачи."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Wildberries»</strong> от разработчика <strong>«Wildberries LLC»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Зарегистрируйтесь",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Найдите товар",
+            content: "Используйте поиск, чтобы найти нужный товар."
+          },
+          {
+            title: "Выберите товар и параметры",
+            content: "Выберите размер, цвет и другие характеристики."
+          },
+          {
+            title: "Добавьте в корзину",
+            content: "Нажмите «Добавить в корзину»."
+          },
+          {
+            title: "Оформите заказ",
+            content: "Укажите адрес доставки (пункт выдачи или курьер), выберите способ оплаты и подтвердите заказ."
+          },
+          {
+            title: "Отслеживайте и забирайте",
+            content: "Следите за статусом заказа в приложении. Когда заказ прибудет в пункт выдачи, заберите его с паспортом."
+          }
+        ]
+      },
+
+      // === ЯНДЕКС МАРКЕТ ===
+      yandex_market: {
+        android: [
+          {
+            title: "Откройте браузер",
+            content: "Запустите любой браузер на вашем телефоне: Chrome, Яндекс.Браузер, или любой другой."
+          },
+          {
+            title: "Перейдите на сайт Яндекс Маркета",
+            content: "В адресной строке наберите: <strong>https://market.yandex.ru</strong> и нажмите Enter."
+          },
+          {
+            title: "Найдите товар",
+            content: "В верхней строке поиска введите название товара (например: «холодильник», «ноутбук»). Нажмите «Найти»."
+          },
+          {
+            title: "Сравните цены",
+            content: "Яндекс Маркет покажет предложения от разных магазинов (OZON, Ситилинк, ДНС, М.Видео и др.). Вы увидите:<br>• <strong>Цену</strong> в каждом магазине"
+          },
+          {
+            title: "Выберите магазин",
+            content: "Нажмите кнопку <strong>«Купить»</strong> у понравившегося предложения. Вы перейдёте на сайт этого магазина."
+          },
+          {
+            title: "Завершите покупку",
+            content: "На сайте магазина укажите адрес доставки, выберите способ оплаты и подтвердите заказ."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте Safari",
+            content: "Нажмите на иконку Safari на главном экране."
+          },
+          {
+            title: "Перейдите на сайт",
+            content: "Наберите в адресной строке: <strong>https://market.yandex.ru</strong>."
+          },
+          {
+            title: "Найдите товар",
+            content: "Введите название товара в поиске."
+          },
+          {
+            title: "Сравните и купите",
+            content: "Выберите магазин с лучшей ценой и условиями доставки. Нажмите «Купить» и завершите покупку на сайте магазина."
+          }
+        ]
+      },
+
+      // === WHATSAPP ===
+      whatsapp: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«WhatsApp Messenger»</strong>. Разработчик: <strong>«Meta Platforms, Inc.»</strong>. Иконка — зелёная с белым телефоном."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Подтвердите номер телефона",
+            content: "Приложение автоматически определит ваш номер телефона. Нажмите <strong>«Продолжить»</strong>. На ваш телефон придёт SMS с кодом из 6 цифр. Введите этот код."
+          },
+          {
+            title: "Настройте профиль (опционально)",
+            content: "Вы можете добавить фото профиля и указать имя, которое будут видеть ваши контакты."
+          },
+          {
+            title: "Начните общаться",
+            content: "WhatsApp автоматически покажет все номера из вашей телефонной книги, у которых тоже установлен WhatsApp. Просто нажмите на контакт и начните писать сообщение."
+          },
+          {
+            title: "Звонки и видеозвонки",
+            content: "В чате с человеком нажмите на значок <strong>телефона</strong> для обычного звонка или на значок <strong>видеокамеры</strong> для видеозвонка. Звонки через интернет — бесплатно."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«WhatsApp Messenger»</strong> от разработчика <strong>«Meta Platforms, Inc.»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Подтвердите номер",
+            content: "Приложение определит ваш номер автоматически. Подтвердите вход кодом из SMS."
+          },
+          {
+            title: "Начните общаться",
+            content: "Ваши контакты с WhatsApp появятся в списке. Пишите сообщения, звоните и делайте видеозвонки."
+          }
+        ]
+      },
+
+      // === TELEGRAM ===
+      telegram: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Telegram»</strong>. Разработчик: <strong>«Telegram FZ-LLC»</strong>. Иконка — синяя с белым самолётиком."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Подтвердите номер телефона",
+            content: "Введите ваш номер телефона и нажмите «Далее». Подтвердите вход кодом из SMS."
+          },
+          {
+            title: "Настройте профиль (опционально)",
+            content: "Добавьте фото профиля и имя."
+          },
+          {
+            title: "Ищите каналы",
+            content: "В поиске наберите тему, которая вас интересует (например: «МЧС Москвы», «Погода»). Подпишитесь на каналы, чтобы получать важные уведомления."
+          },
+          {
+            title: "Общайтесь",
+            content: "Начните чат с друзьями или коллегами. Для этого введите их номер телефона в поиске или нажмите на контакт из вашей телефонной книги."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Telegram»</strong> от разработчика <strong>«Telegram FZ-LLC»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Подтвердите номер",
+            content: "Введите номер телефона и подтвердите SMS-кодом."
+          },
+          {
+            title: "Пользуйтесь всеми функциями",
+            content: "Пишите сообщения, звоните, подписывайтесь на каналы."
+          }
+        ]
+      },
+
+      // === MAX ===
+      max: {
+        android: [
+          {
+            title: "Откройте магазин приложений RuStore",
+            content: "Найдите приложение <strong>«Max»</strong>. Разработчик: <strong>«VK LLC»</strong>. Иконка — фиолетовая с белой буквой «M»."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите кнопку <strong>«Установить»</strong> и дождитесь завершения установки."
+          },
+          {
+            title: "Откройте приложение",
+            content: "Нажмите «Открыть» или найдите иконку на главном экране."
+          },
+          {
+            title: "Войдите через ВКонтакте",
+            content: "Если у вас есть аккаунт ВКонтакте — войдите через него. Если нет — создайте новый аккаунт за 1 минуту (понадобится номер телефона и имя)."
+          },
+          {
+            title: "Общайтесь с друзьями",
+            content: "Все ваши друзья из ВКонтакте автоматически появятся в списке контактов. Нажмите на контакт, чтобы начать чат, звонок или видеосвязь."
+          },
+          {
+            title: "Используйте встроенного ИИ GigaChat 2.0",
+            content: "В списке чатов найдите <strong>«GigaChat»</strong>. Нажмите на него и напишите любой запрос, например:<br>• <strong>«Напиши рецепт борща»</strong><br>• <strong>«Создай картинку кота в очках»</strong>"
+          },
+          {
+            title: "Используйте мини-приложения",
+            content: "Внутри Max можно делать всё без выхода из приложения:<br>• <strong>Заказать еду</strong> — откройте мини-приложение «Яндекс Еда»<br>• <strong>Вызвать такси</strong> — откройте мини-приложение «Яндекс Go»"
+          },
+          {
+            title: "Отправляйте большие файлы",
+            content: "В Max можно отправлять файлы размером до <strong>4 ГБ</strong> — это намного больше, чем в других мессенджерах."
+          }
+        ],
+        iphone: [
+          {
+            title: "Откройте App Store",
+            content: "Найдите приложение <strong>«Max»</strong> от разработчика <strong>«VK LLC»</strong>."
+          },
+          {
+            title: "Установите приложение",
+            content: "Нажмите «Загрузить» и подтвердите установку."
+          },
+          {
+            title: "Войдите через ВКонтакте",
+            content: "Подтвердите вход через аккаунт ВКонтакте или создайте новый."
+          },
+          {
+            title: "Пользуйтесь всеми функциями",
+            content: "Пишите друзьям, используйте GigaChat 2.0, вызывайте такси, заказывайте еду — всё в одном приложении."
+          }
+        ]
+      }
+    };
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${pageId}`).classList.add('active');
+    }
+
+    function goToCategory(category) {
+      currentCategory = category;
+      document.getElementById('os-title').textContent = categories[category];
+      showPage('os');
+    }
+
+    function showAppList(category, os) {
+      currentOS = os;
+      document.getElementById('apps-title').textContent = `${categories[category]} — ${os === 'android' ? 'Android' : 'iPhone'}`;
+      
+      const container = document.getElementById('app-list-container');
+      container.innerHTML = '';
+      
+      const appList = apps[category][os] || [];
+      appList.forEach(app => {
+        const div = document.createElement('div');
+        div.className = `app-card ${app.id}`;
+        div.innerHTML = `
+          <div class="app-icon">${app.icon}</div>
+          <h3>${app.name}</h3>
+          <div class="dev">${app.dev}</div>
+        `;
+        div.onclick = () => showInstruction(app.id, category, os);
+        container.appendChild(div);
+      });
+      
+      showPage('apps');
+    }
+
+    function showInstruction(appId, category, os) {
+      const steps = instructions[appId]?.[os] || [{title: "Инструкция временно недоступна", content: "Пожалуйста, попробуйте позже."}];
+      const app = apps[category][os].find(a => a.id === appId);
+      document.getElementById('instruction-title').textContent = app?.name || 'Инструкция';
+      document.getElementById('instruction-subtitle').textContent = `${os === 'android' ? 'Android' : 'iPhone'} — пошаговое руководство`;
+      
+      const container = document.getElementById('instruction-steps');
+      container.innerHTML = '';
+      
+      steps.forEach((step, i) => {
+        const div = document.createElement('div');
+        div.className = 'step-card';
+        div.innerHTML = `
+          <div class="step-number">${i+1}</div>
+          <div class="step-title">${step.title}</div>
+          <div class="step-content">${step.content}</div>
+        `;
+        container.appendChild(div);
+      });
+      
+      // Добавляем заметку для Госуслуг
+      if (appId === 'gosuslugi') {
+        const note = document.createElement('div');
+        note.className = 'note-card';
+        note.innerHTML = `
+          <h4><i class="fas fa-lightbulb"></i> Важно помнить</h4>
+          <p>Без подтверждения личности в МФЦ или банке вы не сможете:<br>• Оплачивать штрафы ГИБДД со скидкой 50%<br>• Получать загранпаспорт и другие документы</p>
+          <p style="margin-top: 10px;"><strong>Обязательно пройдите подтверждение — это бесплатно и занимает всего 10 минут!</strong></p>
+        `;
+        container.appendChild(note);
+      }
+      
+      showPage('instruction');
+    }
+
+    // Инициализация
+    window.onload = () => {
+      showPage('home');
+    };
+  </script>
+
+</body>
+</html>
